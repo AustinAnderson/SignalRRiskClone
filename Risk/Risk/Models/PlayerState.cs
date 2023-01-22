@@ -19,15 +19,10 @@
         }
         public List<RiskCardSetDescriptor> GetAvailableSets(RiskBoard board)
         {
-            var byType = new Dictionary<RiskCard.Type, List<RiskCard>>();
+            var byType = Enum.GetValues<RiskCard.Type>().ToDictionary(x => x, x => new List<RiskCard>());
             foreach(var card in Cards)
             {
-                if(!byType.TryGetValue(card.CardType, out var group))
-                {
-                    group = new List<RiskCard>();
-                    byType[card.CardType] = group;
-                }
-                group.Add(card);
+                byType[card.CardType].Add(card);
             }
 
             var sets = new List<WorkingRiskCardSet>();
@@ -103,7 +98,7 @@
             {
                 foreach(var card in set.RiskCardRefs)
                 {
-                    if (board[card.TerritoryId].ArmyState.Owner==PlayerColor)
+                    if (card.TerritoryId>=0 && board[card.TerritoryId].ArmyState.Owner==PlayerColor)
                     {
                         set.TerritoryBonusId = card.TerritoryId;
                         break;
